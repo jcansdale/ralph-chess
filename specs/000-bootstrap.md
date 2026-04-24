@@ -12,6 +12,6 @@ else. No domain code yet.
   `tests/ChessEngine.Tests/ChessEngine.Tests.csproj` (xunit,
   references ChessEngine). All three have `<Nullable>enable</Nullable>`
   and `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`.
-- [ ] Add one smoke test in `tests/ChessEngine.Tests/SmokeTests.cs`:
+- [x] Add one smoke test in `tests/ChessEngine.Tests/SmokeTests.cs`:
   `Assert.True(true)`. Confirms `dotnet test` works end-to-end.
 - [ ] `ChessEngine.Cli/Program.cs` prints `"ChessEngine vNEXT"` and exits 0.
