@@ -14,4 +14,4 @@ else. No domain code yet.
   and `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`.
 - [x] Add one smoke test in `tests/ChessEngine.Tests/SmokeTests.cs`:
   `Assert.True(true)`. Confirms `dotnet test` works end-to-end.
-- [ ] `ChessEngine.Cli/Program.cs` prints `"ChessEngine vNEXT"` and exits 0.
+- [x] `ChessEngine.Cli/Program.cs` prints `"ChessEngine vNEXT"` and exits 0.
