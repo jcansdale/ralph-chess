@@ -15,13 +15,34 @@ import { AuthStorage, ModelRegistry, createAgentSession, SessionManager } from "
 import { execSync, spawnSync } from "node:child_process";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 
-// Optional model override via env vars:
-//   RALPH_PROVIDER=anthropic RALPH_MODEL=claude-sonnet-4-5 npx tsx ralph.ts
-//   RALPH_PROVIDER=ollama    RALPH_MODEL=gemma4:26b       npx tsx ralph.ts
-// If unset, pi's default (from settings.json / first available) is used.
-const PROVIDER = process.env.RALPH_PROVIDER;
-const MODEL_ID = process.env.RALPH_MODEL;
-const THINKING = (process.env.RALPH_THINKING ?? "off") as
+// Model selection precedence (highest to lowest):
+//   1. Env vars:    RALPH_PROVIDER, RALPH_MODEL, RALPH_THINKING
+//   2. Config file: ralph.config.json (in cwd)
+//   3. pi default (from ~/.pi/agent/settings.json, first available model)
+//
+// Config file schema:
+//   { "provider": "ollama", "model": "gemma4:26b", "thinking": "medium" }
+interface RalphConfig {
+    provider?: string;
+    model?: string;
+    thinking?: "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
+}
+
+function loadConfig(): RalphConfig {
+    const file = "ralph.config.json";
+    if (!existsSync(file)) return {};
+    try {
+        return JSON.parse(readFileSync(file, "utf8")) as RalphConfig;
+    } catch (e) {
+        console.error(`Failed to parse ${file}:`, e);
+        process.exit(1);
+    }
+}
+
+const fileCfg = loadConfig();
+const PROVIDER = process.env.RALPH_PROVIDER ?? fileCfg.provider;
+const MODEL_ID = process.env.RALPH_MODEL ?? fileCfg.model;
+const THINKING = (process.env.RALPH_THINKING ?? fileCfg.thinking ?? "off") as
     | "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
 
 // ModelRegistry resolves BOTH built-in models AND custom ones from

@@ -1,0 +1,6 @@
+{
+  "_comment": "Copy to ralph.config.json on a run branch. Env vars (RALPH_PROVIDER / RALPH_MODEL / RALPH_THINKING) override these.",
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-5",
+  "thinking": "off"
+}

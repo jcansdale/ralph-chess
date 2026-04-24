@@ -41,15 +41,44 @@ built incrementally, one spec at a time, with tests gating progress.
 Prereqs: Node 20+, .NET 8 SDK, `git`, an API key configured for `pi`
 (`pi` once interactively to set one up, or export `ANTHROPIC_API_KEY`).
 
+Each run lives on its own branch (`run-1`, `run-2`, …). `main` holds
+the base scaffold and dev edits only; iteration commits never land on
+it. Create a new run branch before kicking off:
+
 ```bash
 npm install
-git init && git add -A && git commit -m "initial scaffold"
+git checkout -b run-1
+cp ralph.config.example.json ralph.config.json   # edit to pick your model
+git add ralph.config.json
+git commit -m "run-1: configure model"
 npx tsx ralph.ts
 ```
 
-Watch it work. Each green iteration = one git commit. To stop: Ctrl+C.
-To rewind: `git reset --hard <sha>`. To add scope: drop a new
-`specs/NNN-*.md` file and re-run.
+To compare runs side by side, just use another branch:
+
+```bash
+git checkout main
+git checkout -b run-2
+# edit ralph.config.json to a different model
+git add -A && git commit -m "run-2: sonnet"
+npx tsx ralph.ts
+```
+
+Then `gh compare run-1...run-2` or just `git log run-1 run-2 --oneline --graph`.
+
+### Model selection
+
+Precedence (highest to lowest):
+
+1. Env vars: `RALPH_PROVIDER`, `RALPH_MODEL`, `RALPH_THINKING`
+2. `ralph.config.json` in the working directory
+3. pi default (`~/.pi/agent/settings.json`)
+
+Env-var override is handy for quick ad-hoc runs without touching committed config:
+
+```bash
+RALPH_PROVIDER=anthropic RALPH_MODEL=claude-sonnet-4-5 npx tsx ralph.ts
+```
 
 ## Key design choices (and why)
 
