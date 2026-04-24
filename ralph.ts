@@ -11,22 +11,27 @@
  * Tuning happens in .pi/skills/ralph/SKILL.md, not here.
  */
 
-import { createAgentSession, SessionManager } from "@mariozechner/pi-coding-agent";
-import { getModel } from "@mariozechner/pi-ai";
+import { AuthStorage, ModelRegistry, createAgentSession, SessionManager } from "@mariozechner/pi-coding-agent";
 import { execSync, spawnSync } from "node:child_process";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 
 // Optional model override via env vars:
 //   RALPH_PROVIDER=anthropic RALPH_MODEL=claude-sonnet-4-5 npx tsx ralph.ts
+//   RALPH_PROVIDER=ollama    RALPH_MODEL=gemma4:26b       npx tsx ralph.ts
 // If unset, pi's default (from settings.json / first available) is used.
 const PROVIDER = process.env.RALPH_PROVIDER;
 const MODEL_ID = process.env.RALPH_MODEL;
 const THINKING = (process.env.RALPH_THINKING ?? "off") as
     | "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
 
-const model = PROVIDER && MODEL_ID ? getModel(PROVIDER, MODEL_ID) : undefined;
+// ModelRegistry resolves BOTH built-in models AND custom ones from
+// ~/.pi/agent/models.json (Ollama, LM Studio, vLLM, etc).
+const authStorage = AuthStorage.create();
+const modelRegistry = ModelRegistry.create(authStorage);
+const model = PROVIDER && MODEL_ID ? modelRegistry.find(PROVIDER, MODEL_ID) : undefined;
 if (PROVIDER && MODEL_ID && !model) {
     console.error(`Model not found: ${PROVIDER}/${MODEL_ID}`);
+    console.error(`Check it exists in ~/.pi/agent/models.json or is a built-in provider/id.`);
     process.exit(1);
 }
 if (model) console.log(`Using model: ${PROVIDER}/${MODEL_ID} (thinking=${THINKING})`);
@@ -65,6 +70,8 @@ async function runOnce(iter: number): Promise<"ok" | "no-change" | "failed"> {
 
     const { session } = await createAgentSession({
         sessionManager: SessionManager.inMemory(), // fresh context every iteration
+        authStorage,
+        modelRegistry,
         ...(model ? { model, thinkingLevel: THINKING } : {}),
     });
 
