@@ -38,6 +38,40 @@ Do these steps, in order, once, then stop.
 - Obey every rule in `AGENTS.md` (no TODOs, warnings-as-errors,
   nullable enabled, project layout, style).
 
+### File layout: prefer partial classes, one feature per file
+
+You have no conversation memory between iterations and the `edit`
+tool can be brittle. To stay robust, prefer **writing new files** over
+**editing existing ones**. Concretely:
+
+- Any class that will gain methods across multiple iterations
+  (`Position`, `MoveGenerator`, `Board`, etc.) **must** be declared
+  `partial`. Mark it `partial` the first time you create it.
+- When you add a new method or a cohesive group of methods, put them
+  in their own file named `<ClassName>.<Feature>.cs`, e.g.
+  `Position.FromFen.cs`, `Position.ToFen.cs`,
+  `MoveGenerator.Pawns.cs`. Each such file declares
+  `public partial class <ClassName> { ... }`.
+- Do the same for test classes:
+  `PositionTests.FromFen.cs`, `PositionTests.ToFen.cs`. Declare
+  `public partial class <ClassName>Tests`.
+- This means: adding a method = `write` a new file, not `edit` an
+  existing one. Editing is still fine for tiny, surgical fixes
+  (renaming a symbol, flipping a branch condition), but whole-method
+  additions should always be new files.
+
+Example skeleton for a new feature:
+
+```csharp
+// src/ChessEngine/Position.ToFen.cs
+namespace ChessEngine;
+
+public sealed partial class Position
+{
+    public string ToFen() { /* … */ }
+}
+```
+
 ## 4. Verify locally
 
 Run:
