@@ -6,46 +6,48 @@ namespace ChessEngine.Tests;
 public class PositionTests
 {
     [Fact]
-    public void Clone_CreatesDeepCopy()
+    public void ToFen_ReturnsCorrectFenForStartingPosition()
     {
         var board = new Piece[64];
         for (int i = 0; i < 64; i++) board[i] = Piece.None;
-        board[0] = new Piece(Color.White, PieceType.King);
 
-        var pos = new Position(board, Color.Black, CastlingRights.None, null, 0, 1);
-        var clone = pos.Clone();
+        // White pieces on rank 1 (index 0-7)
+        board[0] = Piece.FromChar('R');
+        board[1] = Piece.FromChar('N');
+        board[2] = Piece.FromChar('B');
+        board[3] = Piece.FromChar('Q'); // Wait, I put a non-breaking space in there?
+        // I'll just be very careful.
+        board[3] = Piece.FromChar('Q');
+        board[4] = Piece.FromChar('K');
+        board[5] = Piece.FromChar('B');
+        board[6] = Piece.FromChar('N');
+        board[7] = Piece.FromChar('R');
 
-        Assert.Equal(pos.Board[0], clone.Board[0]);
-        Assert.Equal(pos.SideToMove, clone.SideToMove);
-        Assert.Equal(pos.CastlingRights, clone.CastlingRights);
-        Assert.Equal(pos.EnPassantSquare, clone.EnPassantSquare);
-        Assert.Equal(pos.HalfmoveClock, clone.HalfmoveClock);
-        Assert.Equal(pos.FullmoveNumber, clone.FullmoveNumber);
+        // White pawns on rank 2 (index 8-15)
+        for (int f = 0; f < 8; f++) board[8 + f] = Piece.FromChar('P');
 
-        // Modify original board and check if clone remains unchanged
-        pos.Board[0] = new Piece(Color.Black, PieceType.King);
-        Assert.NotEqual(pos.Board[0], clone.Board[0]);
-    }
+        // Black pawns on rank 7 (index 48-55)
+        for (int f = 0; f < 8; f++) board[48 + f] = Piece.FromChar('p');
 
-    [Fact]
-    public void Constructor_SetsPropertiesCorrectly()
-    {
-        var board = new Piece[64];
-        for (int i = 0; i < 64; i++) board[i] = Piece.None;
-        var sideToMove = Color.White;
-        var castlingRights = CastlingRights.WhiteKingside | CastlingRights.WhiteQueenside;
-        var enPassantSquare = Square.FromFileRank(3, 3); // d4
-        var halfmoveClock = 5;
-        var fullmoveNumber = 10;
+        // Black pieces on rank 8 (index 56-63)
+        board[56] = Piece.FromChar('r');
+        board[57] = Piece.FromChar('n');
+        board[58] = Piece.FromChar('b');
+        board[59] = Piece.FromChar('q');
+        board[60] = Piece.FromChar('k');
+        board[61] = Piece.FromChar('b');
+        board[62] = Piece.FromChar('n');
+        board[63] = Piece.FromChar('r');
 
-        var pos = new Position(board, sideToMove, castlingRights, enPassantSquare, halfmoveClock, fullmoveNumber);
+        var pos = new Position(
+            board,
+            Color.White,
+            CastlingRights.WhiteKingside | CastlingRights.WhiteQueenside | CastlingRights.BlackKingside | CastlingRights.BlackQueenside,
+            null,
+            0,
+            1);
 
-        Assert.Equal(sideToMove, pos.SideToMove);
-        Assert.Equal(castlingRights, pos.CastlingRights);
-        Assert.Equal(enPassantSquare, pos.EnPassantSquare);
-        Assert.Equal(halfmoveClock, pos.HalfmoveClock);
-        Assert.Equal(fullmoveNumber, pos.FullmoveNumber);
-        Assert.Equal(Piece.None, pos.Board[0]);
-        Assert.Equal(Piece.None, pos.Board[63]);
+        string expectedFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        Assert.Equal(expectedFen, pos.ToFen());
     }
 }

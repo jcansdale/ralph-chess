@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace ChessEngine;
 
 /// <summary>
@@ -16,7 +18,7 @@ public sealed class Position
     public Color SideToMove { get; }
 
     /// <summary>
-    /// The castling rights.
+        /// The castling rights.
     /// </summary>
     public CastlingRights CastlingRights { get; }
 
@@ -31,7 +33,7 @@ public sealed class Position
     public int HalfmoveClock { get; }
 
     /// <summary>
-        /// The fullmove number.
+    /// The fullmove number.
     /// </summary>
     public int FullmoveNumber { get; }
 
@@ -68,5 +70,67 @@ public sealed class Position
     public Position Clone()
     {
         return new Position(Board, SideToMove, CastlingRights, EnPassantSquare, HalfmoveClock, FullmoveNumber);
+    }
+
+    /// <summary>
+    /// Emits the FEN string for the current position.
+    /// </summary>
+    /// <returns>The FEN string.</returns>
+    public string ToFen()
+    {
+        var fen = new StringBuilder();
+
+        for (int rank = 7; rank >= 0; rank--)
+        {
+            int emptySquares = 0;
+            for (int file = 0; file <= 7; file++)
+            {
+                int index = (rank << 3) | file;
+                Piece piece = Board[index];
+                if (piece.Type == PieceType.None)
+                {
+                    emptySquares++;
+                }
+                else
+                {
+                    if (emptySquares > 0)
+                    {
+                        fen.Append(emptySquares);
+                        emptySquares = 0;
+                    }
+                    fen.Append(Piece.ToChar(piece));
+                }
+            }
+            if (emptySquares > 0)
+            {
+                fen.Append(emptySquares);
+            }
+            if (rank > 0)
+            {
+                fen.Append('/');
+            }
+        }
+
+        fen.Append(' ');
+        fen.Append(SideToMove == Color.White ? "w" : "b");
+        fen.Append(' ');
+
+        string castling = "";
+        if (CastlingRights.HasFlag(CastlingRights.WhiteKingside)) castling += 'K';
+        if (CastlingRights.HasFlag(CastlingRights.WhiteQueenside)) castling += 'Q';
+        if (CastlingRights.HasFlag(CastlingRights.BlackKingside)) castling += 'k';
+        if (CastlingRights.HasFlag(CastlingRights.BlackQueenside)) castling += 'q';
+        fen.Append(string.IsNullOrEmpty(castling) ? "-" : castling);
+        fen.Append(' ');
+
+        fen.Append(EnPassantSquare.HasValue ? EnPassantSquare.Value.ToString() : "-");
+        fen.Append(' ');
+
+        fen.Append(HalfmoveClock);
+        fen.Append(' ');
+
+        fen.Append(FullmoveNumber);
+
+        return fen.ToString();
     }
 }
