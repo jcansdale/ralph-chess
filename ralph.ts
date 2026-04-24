@@ -51,13 +51,16 @@ async function runOnce(iter: number): Promise<"ok" | "no-change" | "failed"> {
         sessionManager: SessionManager.inMemory(), // fresh context every iteration
     });
 
-    // Minimal streaming output so you can see what it's doing.
+    // Streaming output: assistant text + one-line-per-tool-call with args.
     session.subscribe((e) => {
         if (e.type === "message_update" && e.assistantMessageEvent.type === "text_delta") {
             process.stdout.write(e.assistantMessageEvent.delta);
         }
         if (e.type === "tool_execution_start") {
-            process.stdout.write(`\n  · ${e.toolName}\n`);
+            process.stdout.write(`\n  · ${formatToolCall(e.toolName, e.args)}\n`);
+        }
+        if (e.type === "tool_execution_end" && e.isError) {
+            process.stdout.write(`    ↳ ERROR\n`);
         }
     });
 
@@ -88,6 +91,37 @@ async function runOnce(iter: number): Promise<"ok" | "no-change" | "failed"> {
     const after = gitHeadSha();
     console.log(`\n[iter ${iter}] ✓ ${before} → ${after}`);
     return "ok";
+}
+
+function truncate(s: string, max = 120): string {
+    const oneLine = String(s ?? "").replace(/\s+/g, " ").trim();
+    return oneLine.length > max ? oneLine.slice(0, max - 1) + "…" : oneLine;
+}
+
+function formatToolCall(name: string, args: any): string {
+    const a = args ?? {};
+    switch (name) {
+        case "bash":
+            return `bash  $ ${truncate(a.command)}`;
+        case "read": {
+            const range = a.offset || a.limit ? ` [${a.offset ?? 0}..+${a.limit ?? "?"}]` : "";
+            return `read  ${a.path}${range}`;
+        }
+        case "write":
+            return `write ${a.path} (${(a.content ?? "").length} bytes)`;
+        case "edit": {
+            const n = Array.isArray(a.edits) ? a.edits.length : 0;
+            return `edit  ${a.path} (${n} change${n === 1 ? "" : "s"})`;
+        }
+        case "grep":
+            return `grep  ${truncate(a.pattern)}  in ${a.path ?? "."}`;
+        case "find":
+            return `find  ${a.path ?? "."}  ${a.pattern ? `name=${a.pattern}` : ""}`.trim();
+        case "ls":
+            return `ls    ${a.path ?? "."}`;
+        default:
+            return `${name}  ${truncate(JSON.stringify(a))}`;
+    }
 }
 
 async function main() {
