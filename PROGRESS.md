@@ -9,3 +9,4 @@ Format: `YYYY-MM-DD  spec-file  short-summary`.
 2026-04-24  specs/000-bootstrap.md  Completed bootstrap task
 2026-04-24  specs/010-board.md  Implemented Position and CastlingRights
 2026-04-24  specs/010-board.md  Implemented Position.ToFen() and unit tests
+2026-04-24  specs/010-board.md  Implemented Position.FromFen and unit tests

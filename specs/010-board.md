@@ -16,14 +16,14 @@ Core value types and position representation. No move generation yet.
 - [x] `sealed class Position` holds: piece array `Piece[64]`, side to
   move, castling rights (flags enum `CastlingRights`), en-passant
   target `Square?`, halfmove clock, fullmove number. Expose `Clone()`.
-- [ ] `Position.ToFen()` — emit a FEN string from a Position. Unit
+- [x] `Position.ToFen()` — emit a FEN string from a Position. Unit
   test: construct the starting position *manually* (put each piece on
   its correct square by index: `Board[0]=WR, Board[1]=WN, ..., Board[63]=BR`)
   and assert `ToFen()` equals the start FEN string exactly.
   > HINT: FEN lists ranks **top-first** (rank 8 first, rank 1 last).
-  > Our square convention: `a1=0`, `h1=7`, `a8=56`, `h8=63`, so
+  > Our square convention: `a1=0`, `if h1=7`, `a8=56`, `h8=63`, so
   > `index = rank*8 + file`. When emitting, walk `rank = 7` down to `0`.
-- [ ] `Position.FromFen(string)` — parse a FEN string into a Position.
+- [x] `Position.FromFen(string)` — parse a FEN string into a Position.
   Round-trip tests (parse then emit must be byte-identical to the input):
   start position, Kiwipete
   (`r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1`),

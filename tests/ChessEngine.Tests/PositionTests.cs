@@ -15,8 +15,6 @@ public class PositionTests
         board[0] = Piece.FromChar('R');
         board[1] = Piece.FromChar('N');
         board[2] = Piece.FromChar('B');
-        board[3] = Piece.FromChar('Q'); // Wait, I put a non-breaking space in there?
-        // I'll just be very careful.
         board[3] = Piece.FromChar('Q');
         board[4] = Piece.FromChar('K');
         board[5] = Piece.FromChar('B');
@@ -49,5 +47,41 @@ public class PositionTests
 
         string expectedFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         Assert.Equal(expectedFen, pos.ToFen());
+    }
+
+    [Fact]
+    public void FromFen_ReturnsCorrectPosition()
+    {
+        string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        var pos = Position.FromFen(fen);
+
+        Assert.Equal(fen, pos.ToFen());
+    }
+
+    [Fact]
+    public void FromFen_KiwipetePosition_ReturnsCorrectPosition()
+    {
+        string fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
+        var pos = Position.FromFen(fen);
+
+        Assert.Equal(fen, pos.ToFen());
+    }
+
+    [Fact]
+    public void FromFen_EnPassantPosition_ReturnsCorrectPosition()
+    {
+        string fen = "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
+        var pos = Position.FromFen(fen);
+
+        Assert.Equal(fen, pos.ToFen());
+    }
+
+    [Fact]
+    public void FromFen_OnlyKingsPosition_ReturnsCorrectPosition()
+    {
+        string fen = "4k3/8/8/8/8/8/8/4K3 w - - 0 1";
+        var pos = Position.FromFen(fen);
+
+        Assert.Equal(fen, pos.ToFen());
     }
 }

@@ -14,11 +14,11 @@ public sealed class Position
 
     /// <summary>
     /// The side to move.
-    /// </summary>
+        /// </summary>
     public Color SideToMove { get; }
 
     /// <summary>
-        /// The castling rights.
+    /// The castling rights.
     /// </summary>
     public CastlingRights CastlingRights { get; }
 
@@ -118,7 +118,8 @@ public sealed class Position
         string castling = "";
         if (CastlingRights.HasFlag(CastlingRights.WhiteKingside)) castling += 'K';
         if (CastlingRights.HasFlag(CastlingRights.WhiteQueenside)) castling += 'Q';
-        if (CastlingRights.HasFlag(CastlingRights.BlackKingside)) castling += 'k';
+        if (CastlingRights.HasFlag(CastlingRights.BlackKingside)) castling
+            += 'k';
         if (CastlingRights.HasFlag(CastlingRights.BlackQueenside)) castling += 'q';
         fen.Append(string.IsNullOrEmpty(castling) ? "-" : castling);
         fen.Append(' ');
@@ -132,5 +133,97 @@ public sealed class Position
         fen.Append(FullmoveNumber);
 
         return fen.ToString();
+    }
+
+    /// <summary>
+    /// Parses a FEN string into a <see cref="Position"/>.
+    /// </summary>
+    /// <param name="fen">The FEN string.</param>
+    /// <returns>The parsed <see cref="Position"/>.</returns>
+    /// <exception cref="FormatException">Thrown if the FEN string is invalid.</exception>
+    public static Position FromFen(string fen)
+    {
+        string[] parts = fen.Split(' ');
+        if (parts.Length != 6)
+        {
+            throw new FormatException("Invalid FEN string: expected 6 parts.");
+        }
+
+        Piece[] board = new Piece[64];
+        for (int i = 0; i < 64; i++) board[i] = Piece.None;
+
+        string[] ranks = parts[0].Split('/');
+        if (ranks.Length != 8)
+        {
+            throw new FormatException("Invalid FEN string: expected 8 ranks.");
+        }
+
+        for (int rankIdx = 0; rankIdx < 8; rankIdx++)
+        {
+            int rank = 7 - rankIdx;
+            string rankString = ranks[rankIdx];
+            int file = 0;
+            int emptySquares = 0;
+
+            foreach (char c in rankString)
+            {
+                if (char.IsDigit(c))
+                {
+                    emptySquares += (c - '0');
+                }
+                else
+                {
+                    if (emptySquares > 0)
+                    {
+                        for (int i = 0; i < emptySquares; i++)
+                        {
+                            board[(rank << 3) | file] = Piece.None;
+                            file++;
+                        }
+                        emptySquares = 0;
+                    }
+                    board[(rank << 3) | file] = Piece.FromChar(c);
+                    file++;
+                }
+            }
+            if (emptySquares > 0)
+            {
+                for (int i = 0; i < emptySquares; i++)
+                {
+                    board[(rank << 3) | file] = Piece.None;
+                    file++;
+                }
+            }
+            if (file != 8)
+            {
+                throw new FormatException("Invalid FEN string: rank does not have 8 squares.");
+            }
+        }
+
+        Color side = parts[1] == "w" ? Color.White : (parts[1] == "b" ? Color.Black : throw new FormatException("Invalid FEN side to move."));
+
+        CastlingRights castling = CastlingRights.None;
+        if (parts[2] != "-")
+        {
+            foreach (char c in parts[2])
+            {
+                if (c == 'K') castling |= CastlingRights.WhiteKingside;
+                else if (c == 'Q') castling |= CastlingRights.WhiteQueenside;
+                else if (c == 'k') castling |= CastlingRights.BlackKingside;
+                else if (c == 'q') castling |= CastlingRights.BlackQueenside;
+                else throw new FormatException("Invalid FEN castling rights.");
+            }
+        }
+
+        Square? enPassant = null;
+        if (parts[3] != "-")
+        {
+            enPassant = Square.Parse(parts[3]);
+        }
+
+        int halfmove = int.Parse(parts[4]);
+        int fullmove = int.Parse(parts[5]);
+
+        return new Position(board, side, castling, enPassant, halfmove, fullmove);
     }
 }
