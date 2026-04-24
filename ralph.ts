@@ -12,8 +12,24 @@
  */
 
 import { createAgentSession, SessionManager } from "@mariozechner/pi-coding-agent";
+import { getModel } from "@mariozechner/pi-ai";
 import { execSync, spawnSync } from "node:child_process";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
+
+// Optional model override via env vars:
+//   RALPH_PROVIDER=anthropic RALPH_MODEL=claude-sonnet-4-5 npx tsx ralph.ts
+// If unset, pi's default (from settings.json / first available) is used.
+const PROVIDER = process.env.RALPH_PROVIDER;
+const MODEL_ID = process.env.RALPH_MODEL;
+const THINKING = (process.env.RALPH_THINKING ?? "off") as
+    | "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
+
+const model = PROVIDER && MODEL_ID ? getModel(PROVIDER, MODEL_ID) : undefined;
+if (PROVIDER && MODEL_ID && !model) {
+    console.error(`Model not found: ${PROVIDER}/${MODEL_ID}`);
+    process.exit(1);
+}
+if (model) console.log(`Using model: ${PROVIDER}/${MODEL_ID} (thinking=${THINKING})`);
 
 const MAX_ITERATIONS = 200;
 const SPECS_DIR = "specs";
@@ -49,6 +65,7 @@ async function runOnce(iter: number): Promise<"ok" | "no-change" | "failed"> {
 
     const { session } = await createAgentSession({
         sessionManager: SessionManager.inMemory(), // fresh context every iteration
+        ...(model ? { model, thinkingLevel: THINKING } : {}),
     });
 
     // Streaming output: assistant text + one-line-per-tool-call with args.
