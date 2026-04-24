@@ -14,9 +14,14 @@ Do these steps, in order, once, then stop.
 ## 1. Orient
 
 - Read `AGENTS.md` in full. Its rules are non-negotiable.
-- Read `PROGRESS.md` to see what previous iterations have completed.
-- List `specs/` alphabetically. Open each file until you find the first
-  one containing an unchecked `- [ ]` item.
+- Read `PROGRESS.md` for a short informational summary of prior work.
+  **Do NOT use it to decide what's done.** It is a human-facing
+  journal and may lag, contain typos, or describe work that was
+  actually reverted. The only source of truth is the `- [ ]` /
+  `- [x]` checkboxes in the spec files.
+- List `specs/` alphabetically. Open each file **in order** and scan
+  its checkboxes. The first spec file that still has any `- [ ]`
+  item is your target. Open it.
 
 ## 2. Pick exactly one item
 
