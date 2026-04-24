@@ -13,7 +13,7 @@ Core value types and position representation. No move generation yet.
   `readonly struct Piece(Color, PieceType)` with `None` static, plus
   `char` conversion (`P n b R q K` etc, uppercase = white). Tests
   cover every piece char round-trip.
-- [ ] `sealed class Position` holds: piece array `Piece[64]`, side to
+- [x] `sealed class Position` holds: piece array `Piece[64]`, side to
   move, castling rights (flags enum `CastlingRights`), en-passant
   target `Square?`, halfmove clock, fullmove number. Expose `Clone()`.
 - [ ] `Position.ToFen()` — emit a FEN string from a Position. Unit

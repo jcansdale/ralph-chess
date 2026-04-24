@@ -1,0 +1,51 @@
+using ChessEngine;
+using Xunit;
+
+namespace ChessEngine.Tests;
+
+public class PositionTests
+{
+    [Fact]
+    public void Clone_CreatesDeepCopy()
+    {
+        var board = new Piece[64];
+        for (int i = 0; i < 64; i++) board[i] = Piece.None;
+        board[0] = new Piece(Color.White, PieceType.King);
+
+        var pos = new Position(board, Color.Black, CastlingRights.None, null, 0, 1);
+        var clone = pos.Clone();
+
+        Assert.Equal(pos.Board[0], clone.Board[0]);
+        Assert.Equal(pos.SideToMove, clone.SideToMove);
+        Assert.Equal(pos.CastlingRights, clone.CastlingRights);
+        Assert.Equal(pos.EnPassantSquare, clone.EnPassantSquare);
+        Assert.Equal(pos.HalfmoveClock, clone.HalfmoveClock);
+        Assert.Equal(pos.FullmoveNumber, clone.FullmoveNumber);
+
+        // Modify original board and check if clone remains unchanged
+        pos.Board[0] = new Piece(Color.Black, PieceType.King);
+        Assert.NotEqual(pos.Board[0], clone.Board[0]);
+    }
+
+    [Fact]
+    public void Constructor_SetsPropertiesCorrectly()
+    {
+        var board = new Piece[64];
+        for (int i = 0; i < 64; i++) board[i] = Piece.None;
+        var sideToMove = Color.White;
+        var castlingRights = CastlingRights.WhiteKingside | CastlingRights.WhiteQueenside;
+        var enPassantSquare = Square.FromFileRank(3, 3); // d4
+        var halfmoveClock = 5;
+        var fullmoveNumber = 10;
+
+        var pos = new Position(board, sideToMove, castlingRights, enPassantSquare, halfmoveClock, fullmoveNumber);
+
+        Assert.Equal(sideToMove, pos.SideToMove);
+        Assert.Equal(castlingRights, pos.CastlingRights);
+        Assert.Equal(enPassantSquare, pos.EnPassantSquare);
+        Assert.Equal(halfmoveClock, pos.HalfmoveClock);
+        Assert.Equal(fullmoveNumber, pos.FullmoveNumber);
+        Assert.Equal(Piece.None, pos.Board[0]);
+        Assert.Equal(Piece.None, pos.Board[63]);
+    }
+}
