@@ -5,7 +5,7 @@ Introduce the `Move` type and generate **pseudo-legal** pawn moves
 
 ## Items
 
-- [ ] `readonly struct Move` packing: from `Square`, to `Square`,
+- [x] `readonly struct Move` packing: from `Square`, to `Square`,
   promotion `PieceType` (None if not a promo), flags for
   double-push / en-passant / capture. Provide `ToUci()` returning
   UCI notation (e.g. `"e2e4"`, `"e7e8q"`). Tests cover UCI emission
