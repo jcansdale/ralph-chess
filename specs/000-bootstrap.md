@@ -5,7 +5,7 @@ else. No domain code yet.
 
 ## Items
 
-- [ ] Create `ChessEngine.sln` with three projects:
+- [x] Create `ChessEngine.sln` with three projects:
   `src/ChessEngine/ChessEngine.csproj` (classlib, net8.0),
   `src/ChessEngine.Cli/ChessEngine.Cli.csproj` (exe, net8.0,
   references ChessEngine),
