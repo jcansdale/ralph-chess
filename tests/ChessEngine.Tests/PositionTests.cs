@@ -3,7 +3,7 @@ using Xunit;
 
 namespace ChessEngine.Tests;
 
-public class PositionTests
+public partial class PositionTests
 {
     [Fact]
     public void ToFen_ReturnsCorrectFenForStartingPosition()

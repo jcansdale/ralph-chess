@@ -5,7 +5,7 @@ namespace ChessEngine;
 /// <summary>
 /// Represents the state of a chess game.
 /// </summary>
-public sealed class Position
+public sealed partial class Position
 {
     /// <summary>
     /// The pieces on the board.
