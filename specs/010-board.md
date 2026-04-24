@@ -34,5 +34,5 @@ Core value types and position representation. No move generation yet.
   > corresponds to board rank `7 - r`. So the *first* rank-string
   > you parse writes to board squares `56..63`, the last to `0..7`.
   > NOT monotonically incrementing from 0.
-- [ ] Start-position FEN constant `Position.StartFen` and
+- [x] Start-position FEN constant `Position.StartFen` and
   `Position.StartingPosition()` factory.
