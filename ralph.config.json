@@ -1,0 +1,5 @@
+{
+  "provider": "ollama",
+  "model": "gemma4:26b",
+  "thinking": "medium"
+}
