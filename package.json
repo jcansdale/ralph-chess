@@ -1,0 +1,16 @@
+{
+  "name": "ralph-chess",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ralph": "tsx ralph.ts"
+  },
+  "dependencies": {
+    "@mariozechner/pi-coding-agent": "latest"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0",
+    "@types/node": "^20.0.0"
+  }
+}

@@ -1,0 +1,10 @@
+node_modules/
+*.log
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+*.nupkg
